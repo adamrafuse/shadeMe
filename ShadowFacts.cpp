@@ -315,7 +315,7 @@ namespace ShadowFacts
 	ShadowSceneProc::ShadowSceneProc( ShadowSceneNode* Root ) :
 		Casters(),		
 		Root(Root),
-		ReducedGrids(Settings::kReduceGridSearch().i ? 1 : 0)
+		ReducedGrids(Settings::kReduceGrids().i ? 1 : 0)
 	{
 		SME_ASSERT(Root && Root->m_children.data[3]);
 	}

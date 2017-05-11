@@ -61,7 +61,7 @@ namespace Settings
 	extern SME::INI::INISetting				kActorsReceiveAllShadows;
 	extern SME::INI::INISetting				kNightTimeMoonShadows;
 	extern SME::INI::INISetting				kBoundRadiusWeight;
-	extern SME::INI::INISetting				kReduceGridSearch;
+	extern SME::INI::INISetting				kReduceGrids;
 	extern SME::INI::INISetting				kExteriorDistanceCheck;
 
 	extern SME::INI::INISetting				kLargeObjectHigherPriority;

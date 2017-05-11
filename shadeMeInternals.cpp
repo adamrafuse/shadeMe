@@ -27,7 +27,7 @@ namespace Settings
 	SME::INI::INISetting			kActorsReceiveAllShadows("ActorsReceiveAllShadows", "Shadows::General", "Actors are valid shadow receivers", (SInt32)1);
 	SME::INI::INISetting			kNightTimeMoonShadows("NightTimeMoonShadows", "Shadows::General", "Moons are shadow casting lights", (SInt32)0);
 	SME::INI::INISetting			kBoundRadiusWeight("BoundRadiusWeight", "Shadows::General", "How much bound radius affects queuing order", (float)2.0f);
-	SME::INI::INISetting			kReduceGridSearch("ReduceGridSearch", "Shadows::General", "Reduce grids for exterior shadows eg. 1 = 3x3, 2 = 1x1", (SInt32)1);
+	SME::INI::INISetting			kReduceGrids("ReduceGrids", "Shadows::General", "Reduce grids for exterior shadows to 3x3", (SInt32)1);
 	SME::INI::INISetting			kExteriorDistanceCheck("ExteriorDistanceCheck", "Shadows::General", "Check CasterMaxDistance in exterior cells", (SInt32)1);
 
 	SME::INI::INISetting			kLargeObjectHigherPriority("HigherPriority", "Shadows::LargeObjects",
@@ -137,7 +137,7 @@ void shadeMeINIManager::Initialize( const char* INIPath, void* Parameter )
 	RegisterSetting(&Settings::kActorsReceiveAllShadows);
 	RegisterSetting(&Settings::kNightTimeMoonShadows);
 	RegisterSetting(&Settings::kBoundRadiusWeight);
-	RegisterSetting(&Settings::kReduceGridSearch);
+	RegisterSetting(&Settings::kReduceGrids);
 	RegisterSetting(&Settings::kExteriorDistanceCheck);
 
 	RegisterSetting(&Settings::kLargeObjectHigherPriority);
