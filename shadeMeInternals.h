@@ -60,10 +60,14 @@ namespace Settings
 	extern SME::INI::INISetting				kNoInteriorSunShadows;
 	extern SME::INI::INISetting				kActorsReceiveAllShadows;
 	extern SME::INI::INISetting				kNightTimeMoonShadows;
+	extern SME::INI::INISetting				kBoundRadiusWeight;
+	extern SME::INI::INISetting				kReduceGridSearch;
+	extern SME::INI::INISetting				kExteriorDistanceCheck;
 
 	extern SME::INI::INISetting				kLargeObjectHigherPriority;
 	extern SME::INI::INISetting				kLargeObjectExcludedPath;
 	extern SME::INI::INISetting				kLargeObjectSunShadowsOnly;
+	extern SME::INI::INISetting				kLargeObjectDistanceWeight;
 
 	extern SME::INI::INISetting				kRenderBackfacesIncludePath;
 
@@ -137,6 +141,7 @@ namespace Settings
 	extern SME::INI::INISetting				kMaxCountMiscItem;			// includes keys
 	extern SME::INI::INISetting				kMaxCountAlchemyItem;
 	extern SME::INI::INISetting				kMaxCountEquipment;			// includes armor, weapon, clothing, ammo
+	extern SME::INI::INISetting				kMaxCountLargeObject;		
 
 	extern SME::INI::INISetting				kMiscForceSM3RenderPath;
 }

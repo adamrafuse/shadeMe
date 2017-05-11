@@ -54,6 +54,8 @@ namespace ShadowFacts
 
 		static bool						SortComparatorDistance(ShadowCaster& LHS, ShadowCaster& RHS);
 		static bool						SortComparatorBoundRadius(ShadowCaster& LHS, ShadowCaster& RHS);
+		static bool						SortComparatorDistanceWeightedBoundRadius(ShadowCaster& LHS, ShadowCaster& RHS);
+		static bool						SortComparatorBoundRadiusWeightedDistance(ShadowCaster & LHS, ShadowCaster & RHS);
 	public:
 		ShadowCaster(NiNode* Node, TESObjectREFR* Object);
 		~ShadowCaster();
@@ -71,6 +73,7 @@ namespace ShadowFacts
 
 		CasterListT						Casters;
 		ShadowSceneNode*				Root;
+		int								ReducedGrids;
 
 		void							DebugDump(void) const;
 		void							CleanupSceneCasters(ShadowLightListT* ValidCasters) const;

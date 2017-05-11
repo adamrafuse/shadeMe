@@ -170,7 +170,7 @@ namespace ShadowFacts
 		{
 			SHADOW_DEBUG(Object, "Failed Shadow Count check");
 		}
-		else if (Distance < Settings::kCasterMaxDistance().f)
+		else if (!Settings::kExteriorDistanceCheck().i || Distance < Settings::kCasterMaxDistance().f)
 		{
 			if (Actor && Settings::kForceActorShadows().i)
 			{
@@ -224,14 +224,14 @@ namespace ShadowFacts
 			else SHADOW_DEBUG(Object, "Failed Bound Radius check (%f)", BoundRadius);
 		}
 		else SHADOW_DEBUG(Object, "Failed Distance check (%f)", Distance);
-
+		
 		if (Result)
 		{
 			Result = ShadowRenderTasks::HasPlayerLOS(Object, Node, Distance);
 			if (Result == false)
 				SHADOW_DEBUG(Object, "Failed Player LOS check");
 		}
-
+		
 		if (Result && Object->parentCell->IsInterior())
 		{
 			Result = ShadowRenderTasks::RunInteriorHeuristicGauntlet(Object, Node, BoundRadius);
@@ -302,9 +302,20 @@ namespace ShadowFacts
 		return LHS.BoundRadius > RHS.BoundRadius;
 	}
 
+	bool ShadowCaster::SortComparatorDistanceWeightedBoundRadius(ShadowCaster& LHS, ShadowCaster& RHS)
+	{		
+		return LHS.BoundRadius - LHS.Distance * Settings::kLargeObjectDistanceWeight().f > RHS.BoundRadius - RHS.Distance * Settings::kLargeObjectDistanceWeight().f;
+	}
+
+	bool ShadowCaster::SortComparatorBoundRadiusWeightedDistance(ShadowCaster& LHS, ShadowCaster& RHS)
+	{			
+		return LHS.Distance - LHS.BoundRadius * Settings::kBoundRadiusWeight().f < RHS.Distance - RHS.BoundRadius * Settings::kBoundRadiusWeight().f;
+	}
+
 	ShadowSceneProc::ShadowSceneProc( ShadowSceneNode* Root ) :
-		Casters(),
-		Root(Root)
+		Casters(),		
+		Root(Root),
+		ReducedGrids(Settings::kReduceGridSearch().i ? 1 : 0)
 	{
 		SME_ASSERT(Root && Root->m_children.data[3]);
 	}
@@ -367,17 +378,18 @@ namespace ShadowFacts
 			ProcessCell(TES::GetSingleton()->currentInteriorCell);
 		else
 		{
-			GridCellArray* CellGrid = TES::GetSingleton()->gridCellArray;
+			GridCellArray* CellGrid = TES::GetSingleton()->gridCellArray;			
 
-			for (int i = 0; i < CellGrid->size; i++)
+			for (int i = ReducedGrids; i < CellGrid->size - ReducedGrids; i++)
 			{
-				for (int j = 0; j < CellGrid->size; j++)
+				for (int j = ReducedGrids; j < CellGrid->size - ReducedGrids; j++)
 				{
 					GridCellArray::GridEntry* Data = CellGrid->GetGridEntry(i, j);
 					if (Data && Data->cell)
 						ProcessCell(Data->cell);
 				}
 			}
+			
 		}
 	}
 
@@ -398,10 +410,12 @@ namespace ShadowFacts
 		gLog.Indent();
 
 		EnumerateSceneCasters();
-
+		
 		if (Settings::kLargeObjectHigherPriority().i)
 		{
-			// sort by bound radius first
+			CasterListT LargeCasters;
+
+			// get all the large objects 
 			std::sort(Casters.begin(), Casters.end(), ShadowCaster::SortComparatorBoundRadius);
 			for (CasterListT::iterator Itr = Casters.begin(); Itr != Casters.end();)
 			{
@@ -410,32 +424,44 @@ namespace ShadowFacts
 
 				if (ShadowRenderTasks::CanBeLargeObject(Itr->Node))
 				{
-					ShadowSceneLight* NewSSL = NULL;
-					if (Itr->Queue(Root, &CasterCount, &NewSSL) == true)
-					{
-						ValidSSLs.push_back(NewSSL);
-
-						if (ShadowSundries::kDebugSelection && Utilities::GetConsoleOpen() == false)
-						{
-							Itr->GetDescription(Buffer);
-		//					_MESSAGE("%s (Large Object) queued", Buffer.c_str());
-						}
-					}
+					LargeCasters.push_back(*Itr);
 
 					// remove from list
 					Itr = Casters.erase(Itr);
 					continue;
 				}
 
-				if (CasterCount.GetSceneSaturated())
+				Itr++;
+			}
+
+			// sort them by bound radius weighted by distance
+			int LargeCount = 0;
+			int LargeCountMax = Settings::kMaxCountLargeObject().i > -1 ? Settings::kMaxCountLargeObject().i : MaxShadowCount;
+			std::sort(LargeCasters.begin(), LargeCasters.end(), ShadowCaster::SortComparatorDistanceWeightedBoundRadius);
+			for (CasterListT::iterator Itr = LargeCasters.begin(); Itr != LargeCasters.end();)
+			{
+				ShadowSceneLight* NewSSL = NULL;
+				if (Itr->Queue(Root, &CasterCount, &NewSSL) == true)
+				{
+					ValidSSLs.push_back(NewSSL);
+					
+					if (ShadowSundries::kDebugSelection && Utilities::GetConsoleOpen() == false)
+					{
+						Itr->GetDescription(Buffer);
+						// _MESSAGE("%s (Large Object) queued", Buffer.c_str());
+					}
+				}
+
+				LargeCount++;
+				if (CasterCount.GetSceneSaturated() || LargeCount >= LargeCountMax)	
 					break;
 
 				Itr++;
 			}
 		}
-
-		// sort by least distance next
-		std::sort(Casters.begin(), Casters.end(), ShadowCaster::SortComparatorDistance);
+		
+		// sort by least distance weighted by bound radius next
+		std::sort(Casters.begin(), Casters.end(), ShadowCaster::SortComparatorBoundRadiusWeightedDistance);
 
 		// now come the actors
 		if (Settings::kForceActorShadows().i || CasterCount.GetSceneSaturated() == false)
@@ -448,7 +474,7 @@ namespace ShadowFacts
 					if (Itr->Queue(Root, &CasterCount, &NewSSL) == true)
 					{
 						ValidSSLs.push_back(NewSSL);
-
+						
 						if (ShadowSundries::kDebugSelection && Utilities::GetConsoleOpen() == false)
 						{
 							Itr->GetDescription(Buffer);
@@ -476,7 +502,7 @@ namespace ShadowFacts
 				if (Itr->Queue(Root, &CasterCount, &NewSSL) == true)
 				{
 					ValidSSLs.push_back(NewSSL);
-
+					
 					if (ShadowSundries::kDebugSelection && Utilities::GetConsoleOpen() == false)
 					{
 						Itr->GetDescription(Buffer);
@@ -488,7 +514,7 @@ namespace ShadowFacts
 					break;
 			}
 		}
-
+		
 		gLog.Outdent();
 	}
 
