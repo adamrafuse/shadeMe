@@ -1,4 +1,4 @@
-### 2017-05-11
+### 2017-05-11 (1.0beta1)
 * Added option to reduce exterior cell grid check to 3x3 as optimization ([Shadows::General] ReduceGrids=1)
 * Added option to disable exterior shadow distance check ([Shadows::General] ExteriorDistanceCheck=0, useful with ReduceGrids=1)
 * Added option to weight shadow sorting by distance for large objects ([Shadows::LargeObjects] DistanceWeight)
