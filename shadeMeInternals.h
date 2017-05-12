@@ -87,6 +87,7 @@ namespace Settings
 	extern SME::INI::INISetting				kPlayerLOSCheckExterior;
 	extern SME::INI::INISetting				kPlayerLOSCheckHighAccuracy;
 	extern SME::INI::INISetting				kPlayerLOSCheckThresholdDist;
+	extern SME::INI::INISetting				kPlayerLOSExcludeLightLOS;
 
 	extern SME::INI::INISetting				kSelfExcludedTypesInterior;
 	extern SME::INI::INISetting				kSelfExcludedTypesExterior;

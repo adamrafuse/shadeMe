@@ -326,6 +326,7 @@ namespace ShadowFacts
 		static PathSubstringListT					BackFaceIncludePaths;
 		static PathSubstringListT					LargeObjectExcludePaths;
 		static PathSubstringListT					LightLOSCheckExcludePaths;
+		static PathSubstringListT					PlayerLOSCheckExcludePaths;
 		static PathSubstringListT					InteriorHeuristicsIncludePaths;
 		static PathSubstringListT					InteriorHeuristicsExcludePaths;
 		static const float							DirectionalLightCheckThresholdDistance;

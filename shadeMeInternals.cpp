@@ -59,6 +59,7 @@ namespace Settings
 	SME::INI::INISetting			kPlayerLOSCheckExterior("Exterior", "Shadows::PlayerLOSCheck", "Check player LOS with caster", (SInt32)1);
 	SME::INI::INISetting			kPlayerLOSCheckHighAccuracy("HighAccuracy", "Shadows::PlayerLOSCheck", "Remove the Z-delta constraint from the check", (SInt32)0);
 	SME::INI::INISetting			kPlayerLOSCheckThresholdDist("ThresholdDistance", "Shadows::PlayerLOSCheck", "", (float)200.f);
+	SME::INI::INISetting			kPlayerLOSExcludeLightLOS("ExcludeLightLOSPaths", "Shadows::PlayerLOSCheck", "Exclude same paths as Shadows::LightLOSCheck ExcludePaths from check (0 or 1)", (SInt32)0);
 
 	SME::INI::INISetting			kSelfExcludedTypesInterior("Interior", "SelfShadows::ExcludedTypes", "Form types that can't cast shadows", "");
 	SME::INI::INISetting			kSelfExcludedTypesExterior("Exterior", "SelfShadows::ExcludedTypes", "Form types that can't cast shadows", "");
@@ -164,6 +165,7 @@ void shadeMeINIManager::Initialize( const char* INIPath, void* Parameter )
 	RegisterSetting(&Settings::kPlayerLOSCheckExterior);
 	RegisterSetting(&Settings::kPlayerLOSCheckHighAccuracy);
 	RegisterSetting(&Settings::kPlayerLOSCheckThresholdDist);
+	RegisterSetting(&Settings::kPlayerLOSExcludeLightLOS);
 
 	RegisterSetting(&Settings::kSelfExcludedTypesInterior);
 	RegisterSetting(&Settings::kSelfExcludedTypesExterior);

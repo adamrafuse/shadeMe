@@ -907,6 +907,7 @@ namespace ShadowFacts
 	PathSubstringListT			ShadowRenderTasks::BackFaceIncludePaths;
 	PathSubstringListT			ShadowRenderTasks::LargeObjectExcludePaths;
 	PathSubstringListT			ShadowRenderTasks::LightLOSCheckExcludePaths;
+	PathSubstringListT			ShadowRenderTasks::PlayerLOSCheckExcludePaths;
 	PathSubstringListT			ShadowRenderTasks::InteriorHeuristicsIncludePaths;
 	PathSubstringListT			ShadowRenderTasks::InteriorHeuristicsExcludePaths;
 	const float					ShadowRenderTasks::DirectionalLightCheckThresholdDistance = 50.f;
@@ -1262,6 +1263,9 @@ namespace ShadowFacts
 	bool ShadowRenderTasks::HasPlayerLOS( TESObjectREFR* Object, NiNode* Node, float Distance )
 	{
 		SME_ASSERT(Object && Node);
+
+		if (Settings::kPlayerLOSExcludeLightLOS().i && BSXFlagsSpecialFlags::GetFlag(Node, BSXFlagsSpecialFlags::kDontPerformLOSCheck) == true)
+			return true;
 
 		bool Interior = Object->parentCell->IsInterior();
 
