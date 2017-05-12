@@ -141,7 +141,8 @@ namespace Settings
 	extern SME::INI::INISetting				kMaxCountMiscItem;			// includes keys
 	extern SME::INI::INISetting				kMaxCountAlchemyItem;
 	extern SME::INI::INISetting				kMaxCountEquipment;			// includes armor, weapon, clothing, ammo
-	extern SME::INI::INISetting				kMaxCountLargeObject;		
+	extern SME::INI::INISetting				kMaxCountLargeObject;
+	extern SME::INI::INISetting				kMaxCountTotalObject;
 
 	extern SME::INI::INISetting				kMiscForceSM3RenderPath;
 }

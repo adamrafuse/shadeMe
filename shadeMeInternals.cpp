@@ -119,7 +119,8 @@ namespace Settings
 	SME::INI::INISetting			kMaxCountMiscItem("MiscItem", "Shadows::MaxCount", "", (SInt32)-1);
 	SME::INI::INISetting			kMaxCountAlchemyItem("AlchemyItem", "Shadows::MaxCount", "", (SInt32)5);
 	SME::INI::INISetting			kMaxCountEquipment("Equipment", "Shadows::MaxCount", "", (SInt32)-1);
-	SME::INI::INISetting			kMaxCountLargeObject("LargeObject", "Shadows::MaxCount", "", (SInt32)-1);
+	SME::INI::INISetting			kMaxCountLargeObject("LargeObject", "Shadows::MaxCount", "", (SInt32)8);
+	SME::INI::INISetting			kMaxCountTotalObject("TotalObject", "Shadows::MaxCount", "", (SInt32)10);
 
 	SME::INI::INISetting			kMiscForceSM3RenderPath("ForceSM3RenderPath", "Misc::Renderer", "", (SInt32)0);
 }
@@ -218,6 +219,7 @@ void shadeMeINIManager::Initialize( const char* INIPath, void* Parameter )
 	RegisterSetting(&Settings::kMaxCountAlchemyItem);
 	RegisterSetting(&Settings::kMaxCountEquipment);
 	RegisterSetting(&Settings::kMaxCountLargeObject);
+	RegisterSetting(&Settings::kMaxCountTotalObject);
 
 	RegisterSetting(&Settings::kMiscForceSM3RenderPath);
 

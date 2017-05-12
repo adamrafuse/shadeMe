@@ -398,6 +398,7 @@ namespace ShadowFacts
 		std::string Buffer;
 		ShadowLightListT ValidSSLs;
 		ShadowCasterCountTable CasterCount(MaxShadowCount);
+		int TotalCount = 0;
 
 		Casters.clear();
 		Casters.reserve(MaxShadowCount);
@@ -444,27 +445,33 @@ namespace ShadowFacts
 				if (Itr->Queue(Root, &CasterCount, &NewSSL) == true)
 				{
 					ValidSSLs.push_back(NewSSL);
-					
+					LargeCount++;
+
 					if (ShadowSundries::kDebugSelection && Utilities::GetConsoleOpen() == false)
 					{
 						Itr->GetDescription(Buffer);
 						// _MESSAGE("%s (Large Object) queued", Buffer.c_str());
 					}
 				}
-
-				LargeCount++;
-				if (CasterCount.GetSceneSaturated() || LargeCount >= LargeCountMax)	
+				
+				if (LargeCount >= LargeCountMax || CasterCount.GetSceneSaturated())
+				{
+					TotalCount = LargeCount;
 					break;
+				}
 
 				Itr++;
 			}
 		}
 		
+		// 
+		int TotalCountMax = Settings::kMaxCountTotalObject().i > -1 ? Settings::kMaxCountTotalObject().i : MaxShadowCount;
+
 		// sort by least distance weighted by bound radius next
 		std::sort(Casters.begin(), Casters.end(), ShadowCaster::SortComparatorBoundRadiusWeightedDistance);
 
 		// now come the actors
-		if (Settings::kForceActorShadows().i || CasterCount.GetSceneSaturated() == false)
+		if (Settings::kForceActorShadows().i || (CasterCount.GetSceneSaturated() == false && TotalCount < TotalCountMax))
 		{
 			for (CasterListT::iterator Itr = Casters.begin(); Itr != Casters.end();)
 			{
@@ -474,7 +481,8 @@ namespace ShadowFacts
 					if (Itr->Queue(Root, &CasterCount, &NewSSL) == true)
 					{
 						ValidSSLs.push_back(NewSSL);
-						
+						TotalCount++;
+
 						if (ShadowSundries::kDebugSelection && Utilities::GetConsoleOpen() == false)
 						{
 							Itr->GetDescription(Buffer);
@@ -486,7 +494,7 @@ namespace ShadowFacts
 					continue;
 				}
 
-				if (Settings::kForceActorShadows().i == 0 && CasterCount.GetSceneSaturated())
+				if (Settings::kForceActorShadows().i == 0 && (CasterCount.GetSceneSaturated() || TotalCount >= TotalCountMax))
 					break;
 
 				Itr++;
@@ -494,7 +502,7 @@ namespace ShadowFacts
 		}
 
 		// the rest follow
-		if (CasterCount.GetSceneSaturated() == false)
+		if (TotalCount < TotalCountMax && CasterCount.GetSceneSaturated() == false)
 		{
 			for (CasterListT::iterator Itr = Casters.begin(); Itr != Casters.end(); Itr++)
 			{
@@ -502,7 +510,8 @@ namespace ShadowFacts
 				if (Itr->Queue(Root, &CasterCount, &NewSSL) == true)
 				{
 					ValidSSLs.push_back(NewSSL);
-					
+					TotalCount++;
+
 					if (ShadowSundries::kDebugSelection && Utilities::GetConsoleOpen() == false)
 					{
 						Itr->GetDescription(Buffer);
@@ -510,7 +519,7 @@ namespace ShadowFacts
 					}
 				}
 
-				if (CasterCount.GetSceneSaturated())
+				if (TotalCount >= TotalCountMax || CasterCount.GetSceneSaturated())
 					break;
 			}
 		}
