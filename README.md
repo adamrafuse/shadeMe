@@ -2,7 +2,7 @@
 
 This is a fork of the [original eponymous shadeMe plugin](https://github.com/shadeMe/shadeMe) which fixes the annoying shadow popping bug 
 when moving around and adds some additional options and optimizations. You can now get nice dynamic shadows on architecture and landscape
-with a low iActorShadowCount setting and minimal performance drop.
+with a low shadow count and minimal performance drop.
 
 ## Usage
 
