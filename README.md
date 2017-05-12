@@ -24,11 +24,17 @@ mitigated by imposing the shadow limit in the plugin and giving the engine enoug
 iActorShadowCountInt=100
 iActorShadowCountExt=100
 ```
-2. Limit the actual number of shadows in *shadeMe.ini* eg.
+2. Limit the actual number of shadows in *shadeMe.ini*. Give large objects higher priority, and disable exterior player LOS check eg.
 ```ini
 [Shadows::MaxCount]
 LargeObject=8
 TotalObject=10
+
+[Shadows::LargeObjects]
+HigherPriority=1
+
+[Shadows::PlayerLOSCheck]
+Exterior=0
 ```
 
 ### Additional options
