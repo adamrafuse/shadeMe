@@ -4,5 +4,5 @@
 * Added option to weight shadow sorting by distance for large objects ([Shadows::LargeObjects] DistanceWeight)
 * Added option to weight shadow sorting by bound radius for normal objects ([Shadows::General] BoundRadiusWeight)
 * Added option to limit max count for large objects ([Shadows::MaxCount] LargeObjects)
-* Added option to limit total objects (([Shadows::MaxCount] TotalObjects)), fixes shadow popping bug when used with [Shadows::MaxCount] LargeObjects and a high enough u\*ShadowCount in oblivion.ini
+* Added option to limit total objects (([Shadows::MaxCount] TotalObjects)), fixes shadow popping bug when used with [Shadows::MaxCount] LargeObjects and a high enough ShadowCount in Oblivion.ini
 * Added option to exclude same paths as LightLOSCheck for PlayerLOSCheck ([Shadows::MaxCount] ExcludeLightLOSPaths)
