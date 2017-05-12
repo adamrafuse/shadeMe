@@ -907,7 +907,6 @@ namespace ShadowFacts
 	PathSubstringListT			ShadowRenderTasks::BackFaceIncludePaths;
 	PathSubstringListT			ShadowRenderTasks::LargeObjectExcludePaths;
 	PathSubstringListT			ShadowRenderTasks::LightLOSCheckExcludePaths;
-	PathSubstringListT			ShadowRenderTasks::PlayerLOSCheckExcludePaths;
 	PathSubstringListT			ShadowRenderTasks::InteriorHeuristicsIncludePaths;
 	PathSubstringListT			ShadowRenderTasks::InteriorHeuristicsExcludePaths;
 	const float					ShadowRenderTasks::DirectionalLightCheckThresholdDistance = 50.f;
