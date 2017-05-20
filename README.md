@@ -4,6 +4,8 @@ This is a fork of the [original eponymous shadeMe plugin](https://github.com/sha
 when moving around and adds some additional options and optimizations. You can now get nice dynamic shadows on architecture and landscape
 with a low shadow count and minimal performance drop.
 
+For releases and general discussion head on over to this plugin's home on the [Oblivion Nexus](http://www.nexusmods.com/oblivion/mods/47779/?).
+
 ## Usage
 
 ### General
