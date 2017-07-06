@@ -292,6 +292,11 @@ namespace ShadowFacts
 		return ShadowRenderTasks::IsLargeObject(Node);
 	}
 
+	bool ShadowCaster::GetIsMediumObject(void) const
+	{
+		return ShadowRenderTasks::IsMediumObject(Node);
+	}
+
 	bool ShadowCaster::SortComparatorDistance( ShadowCaster& LHS, ShadowCaster& RHS )
 	{
 		return LHS.Distance < RHS.Distance;
@@ -398,12 +403,14 @@ namespace ShadowFacts
 		std::string Buffer;
 		ShadowLightListT ValidSSLs;
 		ShadowCasterCountTable CasterCount(MaxShadowCount);
+
 		int TotalCount = 0;
+		int TotalCountMax = Settings::kMaxCountTotalObject().i > -1 ? Settings::kMaxCountTotalObject().i : MaxShadowCount;
 
 		Casters.clear();
 		Casters.reserve(MaxShadowCount);
 
-		if (ShadowSundries::kDebugSelection && Utilities::GetConsoleOpen() == false)
+		if (Settings::kEnableDetailedDebugSelection().i)
 		{
 			_MESSAGE("Executing ShadowSceneProc...");
 		}
@@ -416,63 +423,67 @@ namespace ShadowFacts
 		{
 			CasterListT LargeCasters;
 
-			// get all the large objects 
+			// sort objects by bound radius descending 
 			std::sort(Casters.begin(), Casters.end(), ShadowCaster::SortComparatorBoundRadius);
+
+			// get all the large objects first
+			int LargeCount = 0;
+			int LargeCountMax = Settings::kMaxCountLargeObject().i > -1 ? Settings::kMaxCountLargeObject().i : TotalCountMax;			
+
 			for (CasterListT::iterator Itr = Casters.begin(); Itr != Casters.end();)
-			{
+			{				
 				if (Itr->GetIsLargeObject() == false)
 					break;
 
 				if (ShadowRenderTasks::CanBeLargeObject(Itr->Node))
 				{
-					LargeCasters.push_back(*Itr);
+					LargeCasters.push_back(*Itr);					
+				}				
 
-					// remove from list
-					Itr = Casters.erase(Itr);
-					continue;
-				}
-
-				Itr++;
+				// remove from regular casters list
+				Itr = Casters.erase(Itr);				
+			}
+			
+			// sort them by bound radius weighted by distance
+			if (LargeCountMax > 1) {
+				std::sort(LargeCasters.begin(), LargeCasters.end(), ShadowCaster::SortComparatorDistanceWeightedBoundRadius);
 			}
 
-			// sort them by bound radius weighted by distance
-			int LargeCount = 0;
-			int LargeCountMax = Settings::kMaxCountLargeObject().i > -1 ? Settings::kMaxCountLargeObject().i : MaxShadowCount;
-			std::sort(LargeCasters.begin(), LargeCasters.end(), ShadowCaster::SortComparatorDistanceWeightedBoundRadius);
+			// queue them
 			for (CasterListT::iterator Itr = LargeCasters.begin(); Itr != LargeCasters.end();)
-			{
+			{			
+				if (LargeCount >= LargeCountMax || CasterCount.GetSceneSaturated())
+				{
+					break;
+				}
+
 				ShadowSceneLight* NewSSL = NULL;
 				if (Itr->Queue(Root, &CasterCount, &NewSSL) == true)
 				{
 					ValidSSLs.push_back(NewSSL);
 					LargeCount++;
 
-					if (ShadowSundries::kDebugSelection && Utilities::GetConsoleOpen() == false)
+					if (Settings::kEnableDetailedDebugSelection().i)
 					{
 						Itr->GetDescription(Buffer);
-						// _MESSAGE("%s (Large Object) queued", Buffer.c_str());
+						_MESSAGE("%s (Large Object) queued", Buffer.c_str());
 					}
 				}
 				
-				if (LargeCount >= LargeCountMax || CasterCount.GetSceneSaturated())
-				{
-					TotalCount = LargeCount;
-					break;
-				}
-
 				Itr++;
 			}
-		}
-		
-		// 
-		int TotalCountMax = Settings::kMaxCountTotalObject().i > -1 ? Settings::kMaxCountTotalObject().i : MaxShadowCount;
 
+			TotalCount = LargeCount;
+		}
+				
 		// sort by least distance weighted by bound radius next
 		std::sort(Casters.begin(), Casters.end(), ShadowCaster::SortComparatorBoundRadiusWeightedDistance);
 
 		// now come the actors
-		if (Settings::kForceActorShadows().i || (CasterCount.GetSceneSaturated() == false && TotalCount < TotalCountMax))
+		if (Settings::kForceActorShadows().i || (CasterCount.GetSceneSaturated() == false && TotalCount < TotalCountMax && Settings::kPrioritizeActorShadows().i))
 		{
+			int ActorCount = 0;
+
 			for (CasterListT::iterator Itr = Casters.begin(); Itr != Casters.end();)
 			{
 				ShadowSceneLight* NewSSL = NULL;
@@ -481,12 +492,12 @@ namespace ShadowFacts
 					if (Itr->Queue(Root, &CasterCount, &NewSSL) == true)
 					{
 						ValidSSLs.push_back(NewSSL);
-						TotalCount++;
+						ActorCount++;
 
-						if (ShadowSundries::kDebugSelection && Utilities::GetConsoleOpen() == false)
+						if (Settings::kEnableDetailedDebugSelection().i)
 						{
 							Itr->GetDescription(Buffer);
-		//					_MESSAGE("%s (Actor) queued", Buffer.c_str());
+	   					    _MESSAGE("%s (Actor) queued", Buffer.c_str());
 						}
 					}
 
@@ -494,11 +505,13 @@ namespace ShadowFacts
 					continue;
 				}
 
-				if (Settings::kForceActorShadows().i == 0 && (CasterCount.GetSceneSaturated() || TotalCount >= TotalCountMax))
+				if (Settings::kForceActorShadows().i == 0 && (CasterCount.GetSceneSaturated() || ActorCount >= Settings::kPrioritizeActorShadows().i || TotalCount >= TotalCountMax))
 					break;
 
 				Itr++;
 			}
+
+			TotalCount += ActorCount;
 		}
 
 		// the rest follow
@@ -512,10 +525,10 @@ namespace ShadowFacts
 					ValidSSLs.push_back(NewSSL);
 					TotalCount++;
 
-					if (ShadowSundries::kDebugSelection && Utilities::GetConsoleOpen() == false)
+					if (Settings::kEnableDetailedDebugSelection().i)
 					{
 						Itr->GetDescription(Buffer);
-		//				_MESSAGE("%s queued", Buffer.c_str());
+						_MESSAGE("%s queued", Buffer.c_str());
 					}
 				}
 
@@ -1129,7 +1142,17 @@ namespace ShadowFacts
 	{
 		SME_ASSERT(Node);
 
-		if (Node->m_kWorldBound.radius > Settings::kObjectTier6BoundRadius().f)
+		if (Node->m_kWorldBound.radius >= Settings::kObjectTier6BoundRadius().f)
+			return true;
+		else
+			return false;
+	}
+
+	bool ShadowRenderTasks::IsMediumObject(NiNode* Node)
+	{
+		SME_ASSERT(Node);
+
+		if (Node->m_kWorldBound.radius >= Settings::kObjectTier5BoundRadius().f && Node->m_kWorldBound.radius < Settings::kObjectTier6BoundRadius().f)
 			return true;
 		else
 			return false;

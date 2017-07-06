@@ -51,6 +51,7 @@ namespace ShadowFacts
 
 		ShadowSceneLight*				CreateShadowSceneLight(ShadowSceneNode* Root);
 		bool							GetIsLargeObject(void) const;
+		bool							GetIsMediumObject(void) const;
 
 		static bool						SortComparatorDistance(ShadowCaster& LHS, ShadowCaster& RHS);
 		static bool						SortComparatorBoundRadius(ShadowCaster& LHS, ShadowCaster& RHS);
@@ -379,6 +380,7 @@ namespace ShadowFacts
 
 		static bool									CanBeLargeObject(NiNode* Node);
 		static bool									IsLargeObject(NiNode* Node);
+		static bool									IsMediumObject(NiNode* Node);
 		static bool	__stdcall						PerformAuxiliaryChecks(ShadowSceneLight* Source);
 		static bool									HasPlayerLOS(TESObjectREFR* Object, NiNode* Node, float Distance);
 		static bool									CanReceiveShadow(NiNode* Node);

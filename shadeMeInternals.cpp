@@ -23,6 +23,7 @@ namespace Settings
 	SME::INI::INISetting			kEnableDetailedDebugSelection("EnableDetailedDebugSelection", "Shadows::General",
 													"Toggle the expanded console debug selection description", (SInt32)1);
 	SME::INI::INISetting			kForceActorShadows("ForceActorShadows", "Shadows::General", "Queue actors regardless of their deficiencies", (SInt32)0);
+	SME::INI::INISetting			kPrioritizeActorShadows("PrioritizeActorShadows", "Shadows::General", "Queue actor shadows before others but after large objects", (SInt32)0);
 	SME::INI::INISetting			kNoInteriorSunShadows("ValidateInteriorLightSources", "Shadows::General", "Prevents arbitrary sun shadows", (SInt32)1);
 	SME::INI::INISetting			kActorsReceiveAllShadows("ActorsReceiveAllShadows", "Shadows::General", "Actors are valid shadow receivers", (SInt32)1);
 	SME::INI::INISetting			kNightTimeMoonShadows("NightTimeMoonShadows", "Shadows::General", "Moons are shadow casting lights", (SInt32)0);
@@ -120,7 +121,7 @@ namespace Settings
 	SME::INI::INISetting			kMaxCountMiscItem("MiscItem", "Shadows::MaxCount", "", (SInt32)-1);
 	SME::INI::INISetting			kMaxCountAlchemyItem("AlchemyItem", "Shadows::MaxCount", "", (SInt32)5);
 	SME::INI::INISetting			kMaxCountEquipment("Equipment", "Shadows::MaxCount", "", (SInt32)-1);
-	SME::INI::INISetting			kMaxCountLargeObject("LargeObject", "Shadows::MaxCount", "", (SInt32)8);
+	SME::INI::INISetting			kMaxCountLargeObject("LargeObject", "Shadows::MaxCount", "", (SInt32)7);
 	SME::INI::INISetting			kMaxCountTotalObject("TotalObject", "Shadows::MaxCount", "", (SInt32)10);
 
 	SME::INI::INISetting			kMiscForceSM3RenderPath("ForceSM3RenderPath", "Misc::Renderer", "", (SInt32)0);
@@ -135,6 +136,7 @@ void shadeMeINIManager::Initialize( const char* INIPath, void* Parameter )
 	RegisterSetting(&Settings::kEnableDebugShader);
 	RegisterSetting(&Settings::kEnableDetailedDebugSelection);
 	RegisterSetting(&Settings::kForceActorShadows);
+	RegisterSetting(&Settings::kPrioritizeActorShadows);
 	RegisterSetting(&Settings::kNoInteriorSunShadows);
 	RegisterSetting(&Settings::kActorsReceiveAllShadows);
 	RegisterSetting(&Settings::kNightTimeMoonShadows);
